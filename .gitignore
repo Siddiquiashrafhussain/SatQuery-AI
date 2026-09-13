@@ -1,0 +1,42 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.next/
+
+# Storage / Data
+storage/
+models/
+*.tif
+*.tiff
+*.geojson
+*.cpg
+*.dbf
+*.prj
+*.shp
+*.shx
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Agent Rules
+.agents/
+CLAUDE.md

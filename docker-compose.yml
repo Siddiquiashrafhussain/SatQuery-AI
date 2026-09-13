@@ -1,0 +1,100 @@
+name: satquery-ai
+
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    container_name: satquery_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-satquery}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-satquery}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: satquery_backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - DATABASE_URL=${DATABASE_URL}
+      - API_BASE_URL=${API_BASE_URL:-http://localhost:8000}
+      - STORAGE_PATH=${STORAGE_PATH:-/app/storage}
+      - MODEL_PATH=${MODEL_PATH:-/app/models}
+    volumes:
+      - ./backend:/app
+      - backend_storage:${STORAGE_PATH:-/app/storage}
+      - backend_models:${MODEL_PATH:-/app/models}
+    depends_on:
+      db:
+        condition: service_healthy
+    # Note: GPU worker architecture placeholder
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: satquery_frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - VITE_API_URL=${VITE_API_URL}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  # -------------------------------------------------------------
+  # Future Architecture Services (Commented out for now)
+  # -------------------------------------------------------------
+
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: satquery_redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+
+  # object_storage:
+  #   image: minio/minio:latest
+  #   container_name: satquery_minio
+  #   command: server /data --console-address ":9001"
+  #   environment:
+  #     MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+  #     MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password}
+  #   ports:
+  #     - "9000:9000"
+  #     - "9001:9001"
+  #   volumes:
+  #     - minio_data:/data
+
+volumes:
+  postgres_data:
+  backend_storage:
+  backend_models:
+  # redis_data:
+  # minio_data:
