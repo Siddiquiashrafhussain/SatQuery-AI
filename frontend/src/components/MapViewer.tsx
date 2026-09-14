@@ -1,6 +1,6 @@
 'use client';
 import { useMemo } from 'react';
-import Map, { Source, Layer, NavigationControl } from 'react-map-gl';
+import Map, { Source, Layer, NavigationControl } from 'react-map-gl/maplibre';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 

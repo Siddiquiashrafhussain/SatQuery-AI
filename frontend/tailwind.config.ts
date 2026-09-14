@@ -11,12 +11,13 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        // Custom SatQuery AI Colors
-        'sat-bg-primary': '#0f111a',
-        'sat-bg-secondary': '#1a1d2d',
-        'sat-accent': '#3b82f6',
-        'sat-accent-hover': '#2563eb',
-        'sat-glass': 'rgba(26, 29, 45, 0.7)',
+        // Custom SatQuery AI Colors (High-Contrast Dark Theme)
+        'sat-bg-primary': '#0a0a0a',
+        'sat-bg-secondary': '#171717',
+        'sat-accent': '#10b981',
+        'sat-accent-hover': '#059669',
+        'sat-border': '#333333',
+        'sat-surface': '#171717',
       },
     },
   },

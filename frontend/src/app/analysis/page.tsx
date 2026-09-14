@@ -7,7 +7,7 @@ import AnalysisStatus from '@/components/AnalysisStatus';
 import ResultPanel from '@/components/ResultPanel';
 import EvidencePanel from '@/components/EvidencePanel';
 import ConfidenceCard from '@/components/ConfidenceCard';
-import ExecutionTrace from '@/components/ExecutionTrace';
+import { ExecutionTrace } from '@/components/ExecutionTrace';
 
 export default function AnalysisPage() {
   const [hasImage, setHasImage] = useState(false);
@@ -78,7 +78,7 @@ export default function AnalysisPage() {
         />
         
         {(isAnalyzing || analysisComplete) && <AnalysisStatus complete={analysisComplete} />}
-        {analysisComplete && <ExecutionTrace />}
+        {analysisComplete && <ExecutionTrace steps={[]} />}
       </aside>
 
       {/* Center Column: Visual Evidence (Map/Image) */}

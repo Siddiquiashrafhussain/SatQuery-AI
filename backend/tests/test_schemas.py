@@ -1,26 +1,21 @@
 import pytest
+from pydantic import ValidationError
 
-def test_pydantic_schema_validation():
-    """
-    Test that standard Pydantic schemas correctly validate good data.
-    
-    Example Implementation:
-        from core.schemas import QueryRequest
-        valid_data = {"query": "find ships", "filters": {}}
-        model = QueryRequest(**valid_data)
-        assert model.query == "find ships"
-    """
-    pass
+from app.schemas.domain import AOI, GeoJSONGeometry, QueryRequest
+from datetime import date
 
-def test_pydantic_schema_rejection():
-    """
-    Test that standard Pydantic schemas correctly reject bad data.
-    
-    Example Implementation:
-        from pydantic import ValidationError
-        from core.schemas import QueryRequest
-        
-        with pytest.raises(ValidationError):
-            QueryRequest(query="") # Empty query should fail
-    """
-    pass
+
+def test_query_requires_later_after_earlier():
+    aoi = AOI(
+        geometry=GeoJSONGeometry(
+            type="Polygon",
+            coordinates=[[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]],
+        )
+    )
+    with pytest.raises(ValidationError):
+        QueryRequest(
+            query="test",
+            aoi=aoi,
+            earlier_date=date(2025, 1, 1),
+            later_date=date(2024, 1, 1),
+        )
