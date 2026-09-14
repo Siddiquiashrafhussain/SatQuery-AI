@@ -1023,7 +1023,7 @@ Copyright © 2026 Team LIFTOFF.
 
 **Research & Datasets**
 
-*   [GeoChat — Grounded Large Vision-Language Model for Remote Sensing](https://github.com/mbzuai-orber-lab/GeoChat)
+*   [GeoChat — Grounded Large Vision-Language Model for Remote Sensing](https://arxiv.org/abs/2311.15826)
 *   [VRSBench — A Benchmark for Visual Referring Segmentation in Remote Sensing](https://github.com/lx709/VRSBench)
 *   [RSVQA — Visual Question Answering for Remote Sensing](https://rsvqa.sylvainlobry.com/)
 *   [CDVQA — Change Detection Visual Question Answering](https://github.com/YZHJessica/CDVQA)
