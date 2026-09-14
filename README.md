@@ -21,13 +21,11 @@
   </p>
 
   <p>
-    SatQuery AI converts natural-language questions about satellite imagery into structured remote-sensing analysis workflows. It validates inputs, understands the requested task, routes the request to appropriate specialist models and geospatial tools, performs analysis, validates spatial evidence, and returns an interpretable result with visual evidence, confidence assessment, and execution trace.
+    Welcome to SatQuery AI! We're building an agentic vision-language assistant designed to make satellite image analysis accessible to everyone. Traditionally, diving into geospatial data required deep expertise in GIS and remote sensing. We're breaking that down, allowing decision-makers, urban planners, and disaster-response teams to get reliable, visual intelligence using plain natural language.
   </p>
 </div>
 
 ---
-
-Welcome to SatQuery AI! We're building an agentic vision-language assistant designed to make satellite image analysis accessible to everyone. Traditionally, diving into geospatial data required deep expertise in GIS and remote sensing. We're breaking that down, allowing decision-makers, urban planners, and disaster-response teams to get reliable, visual intelligence using plain natural language.
 
 ## Table of Contents
 
