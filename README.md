@@ -27,6 +27,8 @@
 
 ---
 
+Welcome to SatQuery AI! We're building an agentic vision-language assistant designed to make satellite image analysis accessible to everyone. Traditionally, diving into geospatial data required deep expertise in GIS and remote sensing. We're breaking that down, allowing decision-makers, urban planners, and disaster-response teams to get reliable, visual intelligence using plain natural language.
+
 ## Table of Contents
 
 1.  [Project Overview](#1-project-overview)
