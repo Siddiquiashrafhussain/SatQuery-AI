@@ -11,10 +11,10 @@ class Settings(BaseSettings):
     app_name: str = "SatQuery AI"
     api_prefix: str = "/api/v1"
     cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
-    imagery_provider: str = "development"  # development | earth_engine
-    change_detector: str | None = None  # development | earth_engine; defaults to imagery_provider
-    sar_change_detector: str | None = None  # development | earth_engine; defaults to change_detector
-    semantic_analyzer: str = "development"  # development | earth_engine
+    imagery_provider: str = "earth_engine"  # development | earth_engine
+    change_detector: str | None = "earth_engine"  # development | earth_engine; defaults to imagery_provider
+    sar_change_detector: str | None = "earth_engine"  # development | earth_engine; defaults to change_detector
+    semantic_analyzer: str = "earth_engine"  # development | earth_engine
     earth_engine_project: str | None = None
     # Optional: path to service account JSON (do not commit). EE also supports
     # `earthengine authenticate` or Application Default Credentials.
@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     groq_timeout_s: float = 30.0
     # Upload bi-temporal change detection: bi_temporal (real raster pipeline) | deterministic (seeded mock)
     upload_change_detector: str = "bi_temporal"
+    # Mapillary API v4 access token for live street-level ground-view imagery.
+    # Obtain free at https://www.mapillary.com/dashboard/developers
+    # When absent, ground-view falls back to deterministic mock panoramas.
+    mapillary_access_token: str | None = None
 
     @property
     def effective_change_detector(self) -> str:

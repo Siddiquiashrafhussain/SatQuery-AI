@@ -8,12 +8,14 @@ from app.services.session_chat import session_chat_service
 from app.schemas.ground_context import GroundContextResult
 from app.schemas.region_interpretation import InterpretRegionData, RegionInterpretationRequest
 from app.schemas.region_ranking import BiTemporalRegionRankingResult
-from app.services.mock_ground_context import mock_ground_context_service
+from app.services.live_ground_context import live_ground_context_service
 from app.services.query_controller import query_controller
 from app.services.region_chat import region_chat_service
 from app.services.region_evidence_export import region_evidence_export_service
 from app.services.region_interpretation import region_interpretation_service
 from app.services.region_ranking import region_ranking_service
+from app.schemas.geonli import GeoNLIRequest, GeoNLIResult
+from app.services.geonli_chat import geonli_chat_service
 
 router = APIRouter(prefix="/query", tags=["query"])
 
@@ -75,7 +77,7 @@ async def get_region_ground_context(
     session_id: str,
     region_id: str,
 ) -> ApiResponse[GroundContextResult]:
-    context = mock_ground_context_service.get_ground_context(session_id, region_id)
+    context = live_ground_context_service.get_ground_context(session_id, region_id)
     return success(context)
 
 
@@ -133,3 +135,14 @@ async def chat_session(
             trace_step=trace_step.model_dump(mode="json"),
         )
     )
+
+
+@router.post(
+    "/geonli",
+    response_model=ApiResponse[GeoNLIResult],
+)
+async def submit_geonli(
+    request: GeoNLIRequest,
+) -> ApiResponse[GeoNLIResult]:
+    result = await geonli_chat_service.analyze(request)
+    return success(result)

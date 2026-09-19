@@ -88,7 +88,7 @@ function createGroundViewMarkerElement(
   button.setAttribute("aria-label", `Open Ground View: ${point.title}`);
   button.innerHTML = `
     <span class="ground-view-marker__photo" style="background-image:url('${point.imageUrl}')"></span>
-    <span class="ground-view-marker__label">Ground View</span>
+    <span class="ground-view-marker__label">GROUND<br/>VIEW</span>
     <span class="ground-view-marker__title">${point.title}</span>
   `;
   button.addEventListener("click", (event) => {

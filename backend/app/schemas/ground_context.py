@@ -1,4 +1,4 @@
-"""Mock ground-level context contracts for bi-temporal change regions."""
+"""Ground-level context contracts for bi-temporal change regions."""
 
 from __future__ import annotations
 
@@ -10,6 +10,11 @@ MOCK_GROUND_DISCLOSURE = (
     "This ground-level context is demonstration data and is not real Street View imagery."
 )
 
+MAPILLARY_GROUND_DISCLOSURE = (
+    "Street-level imagery provided by Mapillary (© Mapillary, a Meta company). "
+    "Coverage and recency vary by location."
+)
+
 GroundSceneCategory = Literal[
     "vegetation_loss",
     "built_up_increase",
@@ -17,6 +22,9 @@ GroundSceneCategory = Literal[
     "flood",
     "generic_change",
 ]
+
+GroundContextProvider = Literal["mock_ground_context", "mapillary"]
+GroundContextSourceType = Literal["mock", "street_level"]
 
 
 class GroundContextLocation(BaseModel):
@@ -46,15 +54,15 @@ class GroundContextImage(BaseModel):
 class GroundContextProvenance(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    provider: Literal["mock_ground_context"] = "mock_ground_context"
-    source_type: Literal["mock"] = "mock"
-    status: Literal["demonstration_data"] = "demonstration_data"
-    real_world_imagery: Literal[False] = False
+    provider: GroundContextProvider = "mock_ground_context"
+    source_type: GroundContextSourceType = "mock"
+    status: str = "demonstration_data"
+    real_world_imagery: bool = False
     disclosure: str = MOCK_GROUND_DISCLOSURE
 
 
 class GroundContextResult(BaseModel):
-    """Deterministic mock ground context — contextual demo data, not authoritative evidence."""
+    """Ground-level context for a bi-temporal change region — mock or live street-level imagery."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -66,3 +74,4 @@ class GroundContextResult(BaseModel):
     scene: GroundContextScene
     image: GroundContextImage
     provenance: GroundContextProvenance
+

@@ -67,18 +67,20 @@ export function getAccentColor(): string {
 export function claimTypeColor(claimType: string | undefined): string {
   switch (claimType) {
     case "urban_expansion_candidate":
-      return "#e07b39";
+    case "construction_candidate":
+    case "new_built_area":
+      return "#f97316"; // Orange: Built-up Growth / Urban Sprawl
     case "vegetation_loss_candidate":
-      return "#3d8b5f";
-    case "water_shrinkage_candidate":
-      return "#3b82c4";
+      return "#ef4444"; // Red: Vegetation Decrease / Deforestation
+    case "vegetation_gain_candidate":
+      return "#22c55e"; // Green: Vegetation Increase / Growth
+    case "water_expansion_candidate":
+    case "water_shrinkage_candidate": // If we want to color all water changes blue
+      return "#0ea5e9"; // Blue: Water Expansion / Gain
     case "infrastructure_change_candidate":
       return "#9b7bd4";
     case "mining_change_candidate":
       return "#a67c52";
-    case "construction_candidate":
-    case "new_built_area":
-      return getAccentColor();
     default:
       return getAccentColor();
   }

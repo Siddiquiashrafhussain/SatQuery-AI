@@ -468,8 +468,8 @@ export function Workspace() {
   );
 
   const groundViewPoints = useMemo(
-    () => (aoi ? generateAoiGroundViewPoints(aoi) : []),
-    [aoi],
+    () => (aoi && demoMode ? generateAoiGroundViewPoints(aoi) : []),
+    [aoi, demoMode],
   );
 
   const openGroundView = useCallback((point: GroundViewPoint) => {

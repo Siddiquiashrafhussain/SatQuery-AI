@@ -11,6 +11,8 @@ import type {
   SubmitQueryData,
   TraceStep,
   UploadImageResponse,
+  GeoNLIRequest,
+  GeoNLIResult,
 } from "@/types/domain";
 import { parseHttpErrorBody, API_ERROR_MESSAGES } from "@/lib/errors";
 import { ApiError } from "@/types/domain";
@@ -149,6 +151,12 @@ export const api = {
 
   exportRegionEvidenceUrl: (sessionId: string, regionId: string) =>
     `${API_BASE}/api/v1/query/${sessionId}/regions/${encodeURIComponent(regionId)}/evidence`,
+
+  submitGeoNLI: (payload: GeoNLIRequest) =>
+    request<GeoNLIResult>("/api/v1/query/geonli", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
 
   fetchImageryPreview: async (imageId: string, bbox: string, maxSize = 512): Promise<string> => {
     const params = new URLSearchParams({ bbox, max_size: String(maxSize) });

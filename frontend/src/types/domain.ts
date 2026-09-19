@@ -313,10 +313,10 @@ export interface GroundContextImage {
 }
 
 export interface GroundContextProvenance {
-  provider: "mock_ground_context";
-  source_type: "mock";
-  status: "demonstration_data";
-  real_world_imagery: false;
+  provider: "mock_ground_context" | "mapillary";
+  source_type: "mock" | "street_level";
+  status: string;
+  real_world_imagery: boolean;
   disclosure: string;
 }
 
@@ -393,6 +393,23 @@ export interface TraceStep {
   summary?: string | null;
   error?: string | null;
   metadata?: PlanQueryMetadata | Record<string, unknown> | null;
+}
+
+export interface GeoNLIRequest {
+  premise: string;
+  hypothesis: string;
+  image_id?: string | null;
+}
+
+export interface GeoNLIResult {
+  task: "geonli";
+  entailment_class: "entailment" | "neutral" | "contradiction";
+  reasoning: string;
+  premise: string;
+  hypothesis: string;
+  image_id: string | null;
+  provider: string;
+  model_name: string;
 }
 
 export interface AnalysisResult {

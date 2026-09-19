@@ -22,6 +22,8 @@ export interface GroundViewPoint {
   captureDate: string;
   panorama360: boolean;
   panoramaSpan: number;
+  /** When set, a live Mapillary image was found near this point. */
+  mapillaryImageId?: string | null;
 }
 
 export const GROUND_VIEW_DISCLOSURE =
