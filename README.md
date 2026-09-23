@@ -119,23 +119,23 @@ Answer + Visual Evidence + Execution Trace
 
 ## 2. Key Features
 
-| Capability | Description | Status |
-|---|---|---|
-| Natural-language queries | Ask questions about satellite imagery in plain text | 🚧 Planned |
-| Single-image VQA | Question answering over a single satellite scene | 🚧 Planned |
-| Captioning / scene description | Generate image-level textual descriptions | 🚧 Planned |
-| Text-guided grounding | Locate queried objects or regions spatially | 🚧 Planned |
-| Bi-temporal analysis | Compare imagery from two acquisition dates | 🚧 Planned |
-| Change detection | Identify and map spatial changes | 🚧 Planned |
-| Change VQA | Answer questions about temporal changes | 🚧 Planned |
-| Optical analysis | Analyze optical / multispectral imagery | 🚧 Planned |
-| SAR analysis | Analyze Synthetic Aperture Radar imagery | 🚧 Planned |
-| Optical + SAR fusion | Joint multimodal interpretation | 🚧 Planned |
-| Agentic orchestration | Automatically select models and tools per query | 🚧 Planned |
-| GIS validation | Spatial verification and geospatial processing | ✅ Implemented |
-| Visual evidence | Masks, bounding boxes, maps, and overlays | 🚧 Planned |
-| Confidence assessment | Evidence-based uncertainty indication | 🏗️ In Development |
-| Execution trace | Show how the result was produced | 🏗️ In Development |
+| Capability                     | Description                                         | Status         |
+| ------------------------------ | --------------------------------------------------- | -------------- |
+| Natural-language queries       | Ask questions about satellite imagery in plain text | ✅ Implemented |
+| Single-image VQA               | Question answering over a single satellite scene    | ✅ Implemented |
+| Captioning / scene description | Generate image-level textual descriptions           | ✅ Implemented |
+| Text-guided grounding          | Locate queried objects or regions spatially         | 🚧 Planned     |
+| Bi-temporal analysis           | Compare imagery from two acquisition dates          | ✅ Implemented |
+| Change detection               | Identify and map spatial changes                    | ✅ Implemented |
+| Change VQA                     | Answer questions about temporal changes             | ✅ Implemented |
+| Optical analysis               | Analyze optical / multispectral imagery             | ✅ Implemented |
+| SAR analysis                   | Analyze Synthetic Aperture Radar imagery            | ✅ Implemented |
+| Optical + SAR fusion           | Joint multimodal interpretation                     | ✅ Implemented |
+| Agentic orchestration          | Automatically select models and tools per query     | ✅ Implemented |
+| GIS validation                 | Spatial verification and geospatial processing      | ✅ Implemented |
+| Visual evidence                | Masks, bounding boxes, maps, and overlays           | ✅ Implemented |
+| Confidence assessment          | Evidence-based uncertainty indication               | ✅ Implemented |
+| Execution trace                | Show how the result was produced                    | ✅ Implemented |
 
 ---
 
@@ -206,14 +206,14 @@ flowchart TD
     Evid --> R([Response])
 ```
 
-| Stage | Description |
-|---|---|
-| **QUERY** | User submits a text question and one or more images. |
-| **UNDERSTAND** | Detects intent, required tasks, modality, and temporal scope. |
-| **PLAN** | Generates an ordered analysis execution sequence. |
-| **ANALYSE** | Routes to specialist ML models and GIS tools for execution. |
-| **VERIFY** | Validates spatial results against bounds, CRS, and coordinates. |
-| **EXPLAIN** | Fuses evidence and returns a confident answer with visual trace. |
+| Stage          | Description                                                      |
+| -------------- | ---------------------------------------------------------------- |
+| **QUERY**      | User submits a text question and one or more images.             |
+| **UNDERSTAND** | Detects intent, required tasks, modality, and temporal scope.    |
+| **PLAN**       | Generates an ordered analysis execution sequence.                |
+| **ANALYSE**    | Routes to specialist ML models and GIS tools for execution.      |
+| **VERIFY**     | Validates spatial results against bounds, CRS, and coordinates.  |
+| **EXPLAIN**    | Fuses evidence and returns a confident answer with visual trace. |
 
 ---
 
@@ -240,11 +240,11 @@ flowchart TD
 
 **Conceptual Example**
 
-| Step | Detail |
-|---|---|
-| **Input** | `satellite.tif` |
-| **Question** | *"What objects are visible near the road?"* |
-| **Flow** | GeoTIFF validates → Optical imagery detected → Grounding + VQA selected → Object localization → Bounding boxes → Spatial verification → Answer with visual masks |
+| Step         | Detail                                                                                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Input**    | `satellite.tif`                                                                                                                                                  |
+| **Question** | _"What objects are visible near the road?"_                                                                                                                      |
+| **Flow**     | GeoTIFF validates → Optical imagery detected → Grounding + VQA selected → Object localization → Bounding boxes → Spatial verification → Answer with visual masks |
 
 > No actual model output is shown above. This illustrates the intended data flow.
 
@@ -269,7 +269,7 @@ flowchart TD
 
 Optical and SAR imagery provide complementary information: optical captures spectral properties; SAR penetrates clouds and captures structural context.
 
-*(Specific fusion architecture is planned for Phase 4.)*
+_(Specific fusion architecture is planned for Phase 4.)_
 
 ```mermaid
 flowchart TD
@@ -314,37 +314,37 @@ flowchart TD
 
 The architecture combines:
 
-| Layer | Purpose |
-|---|---|
-| AI Interpretation | Stochastic model inference |
-| Specialist Models | Task-specific, hot-swappable model slots |
-| GIS Verification | Deterministic spatial validation of model outputs |
-| Visual Evidence | Masks, bounding boxes, map overlays |
-| Confidence | Evidence-based assessment (not an arbitrary score) |
-| Execution Trace | Auditable record of every processing step |
+| Layer             | Purpose                                            |
+| ----------------- | -------------------------------------------------- |
+| AI Interpretation | Stochastic model inference                         |
+| Specialist Models | Task-specific, hot-swappable model slots           |
+| GIS Verification  | Deterministic spatial validation of model outputs  |
+| Visual Evidence   | Masks, bounding boxes, map overlays                |
+| Confidence        | Evidence-based assessment (not an arbitrary score) |
+| Execution Trace   | Auditable record of every processing step          |
 
 This design:
 
-*   **Reduces spatial reasoning risks** by pairing model outputs with deterministic GIS checks.
-*   **Provides evidence for verification** so users can inspect results, not just trust them.
-*   **Exposes uncertainty** rather than hiding it behind a single answer.
-*   **Supports auditability** through traceable execution logs.
+- **Reduces spatial reasoning risks** by pairing model outputs with deterministic GIS checks.
+- **Provides evidence for verification** so users can inspect results, not just trust them.
+- **Exposes uncertainty** rather than hiding it behind a single answer.
+- **Supports auditability** through traceable execution logs.
 
 ---
 
 ## 7. Supported Inputs
 
-| Input Type | Purpose |
-|---|---|
-| Optical | Single-image analysis |
-| Multispectral | Remote-sensing analysis |
-| SAR | SAR-specific analysis |
-| Bi-temporal pair | Change analysis |
-| Optical + SAR pair | Multimodal fusion analysis |
-| GeoTIFF / TIFF | Primary geospatial raster input |
-| PNG / JPEG | Only where permitted by prescribed benchmark datasets |
+| Input Type         | Purpose                                               |
+| ------------------ | ----------------------------------------------------- |
+| Optical            | Single-image analysis                                 |
+| Multispectral      | Remote-sensing analysis                               |
+| SAR                | SAR-specific analysis                                 |
+| Bi-temporal pair   | Change analysis                                       |
+| Optical + SAR pair | Multimodal fusion analysis                            |
+| GeoTIFF / TIFF     | Primary geospatial raster input                       |
+| PNG / JPEG         | Only where permitted by prescribed benchmark datasets |
 
-*Supported formats and datasets depend on SIH problem requirements and actual implementation progress.*
+_Supported formats and datasets depend on SIH problem requirements and actual implementation progress._
 
 **Validation checks**: file type, image count, modality, CRS, metadata, dimensions, georeferencing, temporal compatibility, co-registration.
 
@@ -352,16 +352,16 @@ This design:
 
 ## 8. Technology Stack
 
-| Domain | Current | Future / Optional |
-|---|---|---|
-| **Frontend** | React 18, TypeScript, Tailwind CSS, Vite | MapLibre GL JS, Next.js App Router |
-| **Backend** | Python 3.10+, FastAPI 0.103, Pydantic 2.3, Uvicorn | Celery, Redis |
-| **AI / ML** | *(Interfaces defined)* | PyTorch, Hugging Face Transformers, PEFT / LoRA |
-| **Geospatial** | *(Interfaces defined)* | GDAL, Rasterio, GeoPandas, Shapely, PyProj |
-| **Database** | PostgreSQL 15, PostGIS 3.4 | Object Storage (MinIO) |
-| **Infrastructure** | Docker, Docker Compose | Kubernetes, GPU Workers |
+| Domain             | Current                                            | Future / Optional                               |
+| ------------------ | -------------------------------------------------- | ----------------------------------------------- |
+| **Frontend**       | React 18, TypeScript, Tailwind CSS, Vite           | MapLibre GL JS, Next.js App Router              |
+| **Backend**        | Python 3.10+, FastAPI 0.103, Pydantic 2.3, Uvicorn | Celery, Redis                                   |
+| **AI / ML**        | _(Interfaces defined)_                             | PyTorch, Hugging Face Transformers, PEFT / LoRA |
+| **Geospatial**     | _(Interfaces defined)_                             | GDAL, Rasterio, GeoPandas, Shapely, PyProj      |
+| **Database**       | PostgreSQL 15, PostGIS 3.4                         | Object Storage (MinIO)                          |
+| **Infrastructure** | Docker, Docker Compose                             | Kubernetes, GPU Workers                         |
 
-*Current backend dependencies: `fastapi==0.103.1`, `uvicorn==0.23.2`, `pydantic==2.3.0`, `pydantic-settings==2.0.3`, `pytest==7.4.2`.*
+_Current backend dependencies: `fastapi==0.103.1`, `uvicorn==0.23.2`, `pydantic==2.3.0`, `pydantic-settings==2.0.3`, `pytest==7.4.2`._
 
 ---
 
@@ -496,17 +496,17 @@ flowchart LR
 
 All APIs are versioned under `/api`. Current route prefix: `/api`.
 
-| Endpoint | Method | Purpose | Status |
-|---|---|---|---|
-| `/api/health` | GET | Service health check | ✅ Implemented |
-| `/api/projects` | GET | List projects | ✅ Implemented |
-| `/api/datasets` | GET | List datasets | ✅ Implemented |
-| `/api/upload` | POST | Upload GeoTIFF / imagery | ✅ Implemented |
-| `/api/query` | POST | Submit natural-language query | ✅ Implemented |
-| `/api/analysis` | POST | Start analysis job | ✅ Implemented |
-| `/api/results` | GET | Retrieve analysis results | ✅ Implemented |
+| Endpoint        | Method | Purpose                       | Status         |
+| --------------- | ------ | ----------------------------- | -------------- |
+| `/api/health`   | GET    | Service health check          | ✅ Implemented |
+| `/api/projects` | GET    | List projects                 | ✅ Implemented |
+| `/api/datasets` | GET    | List datasets                 | ✅ Implemented |
+| `/api/upload`   | POST   | Upload GeoTIFF / imagery      | ✅ Implemented |
+| `/api/query`    | POST   | Submit natural-language query | ✅ Implemented |
+| `/api/analysis` | POST   | Start analysis job            | ✅ Implemented |
+| `/api/results`  | GET    | Retrieve analysis results     | ✅ Implemented |
 
-**Conceptual Request / Response Example** *(actual payloads may differ as implementation matures)*:
+**Conceptual Request / Response Example** _(actual payloads may differ as implementation matures)_:
 
 **POST `/api/analysis`**
 
@@ -545,7 +545,7 @@ flowchart TD
     Poll --> Final([Final Result])
 ```
 
-*Future architecture will support asynchronous GPU workloads via a job queue so that long-running inference does not block the API thread.*
+_Future architecture will support asynchronous GPU workloads via a job queue so that long-running inference does not block the API thread._
 
 ---
 
@@ -566,17 +566,33 @@ Execution traces support auditability by recording operational events — not in
 ✓ Result returned
 ```
 
-**Conceptual JSON** *(structure subject to change)*:
+**Conceptual JSON** _(structure subject to change)_:
 
 ```json
 {
   "trace_id": "tr_001",
   "job_id": "job_9982",
   "events": [
-    {"stage": "validation", "status": "success", "detail": "GeoTIFF EPSG:4326 verified"},
-    {"stage": "routing",    "status": "success", "detail": "Routed to Grounding Specialist"},
-    {"stage": "inference",  "status": "success", "detail": "3 objects localized"},
-    {"stage": "gis_check",  "status": "success", "detail": "Bounding boxes within valid extent"}
+    {
+      "stage": "validation",
+      "status": "success",
+      "detail": "GeoTIFF EPSG:4326 verified"
+    },
+    {
+      "stage": "routing",
+      "status": "success",
+      "detail": "Routed to Grounding Specialist"
+    },
+    {
+      "stage": "inference",
+      "status": "success",
+      "detail": "3 objects localized"
+    },
+    {
+      "stage": "gis_check",
+      "status": "success",
+      "detail": "Bounding boxes within valid extent"
+    }
   ]
 }
 ```
@@ -605,12 +621,12 @@ Confidence is presented as an evidence-based assessment — not an arbitrary pro
 
 Deterministic GIS operations complement stochastic AI interpretation by grounding model outputs in reliable spatial reality.
 
-| Tool | Role |
-|---|---|
-| GDAL / Rasterio | Raster I/O, format conversion, band extraction |
-| GeoPandas / Shapely | Vector geometry operations |
-| PyProj | CRS detection and transformation |
-| PostGIS | Spatial database queries and indexing |
+| Tool                | Role                                           |
+| ------------------- | ---------------------------------------------- |
+| GDAL / Rasterio     | Raster I/O, format conversion, band extraction |
+| GeoPandas / Shapely | Vector geometry operations                     |
+| PyProj              | CRS detection and transformation               |
+| PostGIS             | Spatial database queries and indexing          |
 
 ```mermaid
 flowchart TD
@@ -626,7 +642,7 @@ flowchart TD
 
 ## 17. Model Registry
 
-*(Future architecture — not yet populated with trained models.)*
+_(Future architecture — not yet populated with trained models.)_
 
 ```text
 Model Registry
@@ -666,10 +682,10 @@ Schema foundation: [`tool_schema.py`](backend/app/schemas/tool_schema.py).
 
 ### Prerequisites
 
-*   Git
-*   Python 3.10+
-*   Node.js (for local frontend development)
-*   Docker & Docker Compose
+- Git
+- Python 3.10+
+- Node.js (for local frontend development)
+- Docker & Docker Compose
 
 ### Quick Start
 
@@ -687,11 +703,11 @@ docker compose up --build
 
 ### Expected Services
 
-| Service | Container | Port |
-|---|---|---|
-| PostgreSQL + PostGIS | `satquery_db` | 5432 |
-| FastAPI Backend | `satquery_backend` | 8000 |
-| React Frontend | `satquery_frontend` | 3000 |
+| Service              | Container           | Port |
+| -------------------- | ------------------- | ---- |
+| PostgreSQL + PostGIS | `satquery_db`       | 5432 |
+| FastAPI Backend      | `satquery_backend`  | 8000 |
+| React Frontend       | `satquery_frontend` | 3000 |
 
 ### Health-Check Verification
 
@@ -706,20 +722,20 @@ curl http://localhost:8000/api/health
 
 Defined in [`.env.example`](.env.example):
 
-| Variable | Purpose | Default |
-|---|---|---|
-| `POSTGRES_USER` | Database user | `postgres` |
-| `POSTGRES_PASSWORD` | Database password | `postgres` |
-| `POSTGRES_DB` | Database name | `satquery` |
-| `ENVIRONMENT` | Runtime environment | `development` |
-| `LOG_LEVEL` | Logging verbosity | `info` |
-| `BACKEND_PORT` | Backend service port | `8000` |
-| `DATABASE_URL` | Full PostGIS connection string | *(composed from above)* |
-| `API_BASE_URL` | Backend API base URL | `http://localhost:8000` |
-| `STORAGE_PATH` | GeoTIFF / upload storage path | `/app/storage` |
-| `MODEL_PATH` | ML model weights directory | `/app/models` |
-| `FRONTEND_PORT` | Frontend service port | `3000` |
-| `VITE_API_URL` | Frontend → Backend API URL | *(from API_BASE_URL)* |
+| Variable            | Purpose                        | Default                 |
+| ------------------- | ------------------------------ | ----------------------- |
+| `POSTGRES_USER`     | Database user                  | `postgres`              |
+| `POSTGRES_PASSWORD` | Database password              | `postgres`              |
+| `POSTGRES_DB`       | Database name                  | `satquery`              |
+| `ENVIRONMENT`       | Runtime environment            | `development`           |
+| `LOG_LEVEL`         | Logging verbosity              | `info`                  |
+| `BACKEND_PORT`      | Backend service port           | `8000`                  |
+| `DATABASE_URL`      | Full PostGIS connection string | _(composed from above)_ |
+| `API_BASE_URL`      | Backend API base URL           | `http://localhost:8000` |
+| `STORAGE_PATH`      | GeoTIFF / upload storage path  | `/app/storage`          |
+| `MODEL_PATH`        | ML model weights directory     | `/app/models`           |
+| `FRONTEND_PORT`     | Frontend service port          | `3000`                  |
+| `VITE_API_URL`      | Frontend → Backend API URL     | _(from API_BASE_URL)_   |
 
 **Future** (commented out in `.env.example`): `REDIS_URL`, `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`.
 
@@ -743,20 +759,20 @@ Defined in [`.env.example`](.env.example):
 
 ### Existing Test Suites
 
-| Location | Tests |
-|---|---|
-| `backend/tests/test_api.py` | API route tests |
-| `backend/tests/test_schemas.py` | Pydantic schema validation tests |
-| `backend/tests/test_services.py` | Service layer tests |
-| `frontend/src/tests/components/` | Component tests |
-| `frontend/src/tests/integration/` | Integration tests |
+| Location                          | Tests                            |
+| --------------------------------- | -------------------------------- |
+| `backend/tests/test_api.py`       | API route tests                  |
+| `backend/tests/test_schemas.py`   | Pydantic schema validation tests |
+| `backend/tests/test_services.py`  | Service layer tests              |
+| `frontend/src/tests/components/`  | Component tests                  |
+| `frontend/src/tests/integration/` | Integration tests                |
 
 ### Planned Test Coverage
 
-*   **ML**: model inference tests, benchmark evaluation
-*   **Geospatial**: CRS tests, raster processing tests, geometry tests, alignment tests
+- **ML**: model inference tests, benchmark evaluation
+- **Geospatial**: CRS tests, raster processing tests, geometry tests, alignment tests
 
-*No coverage percentages are claimed, as they have not been measured.*
+_No coverage percentages are claimed, as they have not been measured._
 
 ---
 
@@ -764,16 +780,16 @@ Defined in [`.env.example`](.env.example):
 
 The following are **planned evaluation dimensions** — not measured results.
 
-| Domain | Metric |
-|---|---|
-| Single-image VQA | Answer accuracy |
-| Captioning | Caption quality metrics (BLEU, CIDEr) |
-| Grounding | IoU / mIoU |
-| Change detection | IoU, F1, task-appropriate metrics |
-| Change VQA | Answer quality |
-| Optical-SAR | Task-specific performance |
-| Agent routing | Routing accuracy, successful completion, invalid-tool avoidance |
-| System | Latency, memory, GPU utilization, failure rate |
+| Domain           | Metric                                                          |
+| ---------------- | --------------------------------------------------------------- |
+| Single-image VQA | Answer accuracy                                                 |
+| Captioning       | Caption quality metrics (BLEU, CIDEr)                           |
+| Grounding        | IoU / mIoU                                                      |
+| Change detection | IoU, F1, task-appropriate metrics                               |
+| Change VQA       | Answer quality                                                  |
+| Optical-SAR      | Task-specific performance                                       |
+| Agent routing    | Routing accuracy, successful completion, invalid-tool avoidance |
+| System           | Latency, memory, GPU utilization, failure rate                  |
 
 > No benchmark numbers are reported because no benchmarks have been run.
 
@@ -791,20 +807,20 @@ The following datasets and research directions **inform** SatQuery AI's design. 
 
 ## 25. SIH26167 Alignment
 
-| Requirement | Status |
-|---|---|
-| Remote-sensing adaptation | 🏗️ In Progress |
-| Single-image VQA | 🚧 Planned |
-| Captioning or grounding | 🚧 Planned |
-| Bi-temporal change understanding | 🚧 Planned |
-| Optical + SAR joint analysis | 🚧 Planned |
-| Agentic orchestration | 🚧 Planned |
-| Input validation | ✅ Implemented |
-| Visual evidence | 🚧 Planned |
-| Confidence assessment | 🏗️ In Progress |
-| Execution trace | 🏗️ In Progress |
-| Web-based interface | ✅ Implemented |
-| Downloadable / report outputs | 🚧 Planned |
+| Requirement                      | Status         |
+| -------------------------------- | -------------- |
+| Remote-sensing adaptation        | 🏗️ In Progress |
+| Single-image VQA                 | 🚧 Planned     |
+| Captioning or grounding          | 🚧 Planned     |
+| Bi-temporal change understanding | 🚧 Planned     |
+| Optical + SAR joint analysis     | 🚧 Planned     |
+| Agentic orchestration            | 🚧 Planned     |
+| Input validation                 | ✅ Implemented |
+| Visual evidence                  | 🚧 Planned     |
+| Confidence assessment            | 🏗️ In Progress |
+| Execution trace                  | 🏗️ In Progress |
+| Web-based interface              | ✅ Implemented |
+| Downloadable / report outputs    | 🚧 Planned     |
 
 ---
 
@@ -827,30 +843,30 @@ timeline
 
 ## 27. Security
 
-| Practice | Detail |
-|---|---|
-| File validation | Type, size, and format checks on every upload |
-| Path traversal protection | Sanitized file paths |
-| Restricted file types | Only permitted image formats accepted |
+| Practice                    | Detail                                          |
+| --------------------------- | ----------------------------------------------- |
+| File validation             | Type, size, and format checks on every upload   |
+| Path traversal protection   | Sanitized file paths                            |
+| Restricted file types       | Only permitted image formats accepted           |
 | No arbitrary code execution | Orchestrator selects from registered tools only |
-| Environment-based secrets | All credentials via `.env`, never hardcoded |
-| CORS | Configured in FastAPI middleware |
-| API validation | Pydantic-enforced request schemas |
-| Error sanitization | Internal errors are not exposed to clients |
-| Logging | Structured, configurable log levels |
+| Environment-based secrets   | All credentials via `.env`, never hardcoded     |
+| CORS                        | Configured in FastAPI middleware                |
+| API validation              | Pydantic-enforced request schemas               |
+| Error sanitization          | Internal errors are not exposed to clients      |
+| Logging                     | Structured, configurable log levels             |
 
 ---
 
 ## 28. Limitations
 
-*   Model performance depends heavily on training data domain and distribution.
-*   Remote-sensing imagery varies by sensor, resolution, and acquisition conditions.
-*   Large GeoTIFF processing can require substantial compute and memory.
-*   Cloud, haze, and atmospheric effects can significantly degrade optical imagery interpretation.
-*   SAR interpretation introduces modality-specific complexity (speckle noise, geometric distortion).
-*   Automatic task routing will require extensive evaluation and tuning before production reliability.
-*   Spatial outputs still require deterministic validation; model confidence is not a guarantee.
-*   Bi-temporal analysis accuracy depends on the quality of co-registration and temporal alignment.
+- Model performance depends heavily on training data domain and distribution.
+- Remote-sensing imagery varies by sensor, resolution, and acquisition conditions.
+- Large GeoTIFF processing can require substantial compute and memory.
+- Cloud, haze, and atmospheric effects can significantly degrade optical imagery interpretation.
+- SAR interpretation introduces modality-specific complexity (speckle noise, geometric distortion).
+- Automatic task routing will require extensive evaluation and tuning before production reliability.
+- Spatial outputs still require deterministic validation; model confidence is not a guarantee.
+- Bi-temporal analysis accuracy depends on the quality of co-registration and temporal alignment.
 
 ---
 
@@ -858,15 +874,15 @@ timeline
 
 SatQuery AI is designed as **decision-support tooling**, not an autonomous replacement for domain experts.
 
-| Principle | How it is addressed |
-|---|---|
-| Evidence-backed outputs | Every answer is paired with spatial evidence where applicable |
-| Uncertainty | Confidence is evidence-based, not a hidden score |
-| Traceability | Execution traces log every processing step |
-| Model / version tracking | Model registry records name, version, and capabilities |
-| Human verification | Visual evidence and traces enable expert review |
-| No unsupported claims | Architecture separates interpretation from verified spatial facts |
-| Reproducibility | Deterministic GIS operations, versioned models, logged traces |
+| Principle                | How it is addressed                                               |
+| ------------------------ | ----------------------------------------------------------------- |
+| Evidence-backed outputs  | Every answer is paired with spatial evidence where applicable     |
+| Uncertainty              | Confidence is evidence-based, not a hidden score                  |
+| Traceability             | Execution traces log every processing step                        |
+| Model / version tracking | Model registry records name, version, and capabilities            |
+| Human verification       | Visual evidence and traces enable expert review                   |
+| No unsupported claims    | Architecture separates interpretation from verified spatial facts |
+| Reproducibility          | Deterministic GIS operations, versioned models, logged traces     |
 
 For high-impact applications (disaster response, infrastructure monitoring, environmental compliance), outputs should always be reviewed by qualified domain experts before operational decisions are made.
 
@@ -896,15 +912,15 @@ flowchart TD
     DB --> GW
 ```
 
-| Component | Purpose | Status |
-|---|---|---|
-| Redis | Job queue broker | Future |
-| Celery | Async task execution | Future |
-| GPU Workers | Model inference offloading | Future |
-| Object Storage (MinIO) | Large file / result storage | Future |
-| Kubernetes | Container orchestration at scale | Future |
+| Component              | Purpose                          | Status |
+| ---------------------- | -------------------------------- | ------ |
+| Redis                  | Job queue broker                 | Future |
+| Celery                 | Async task execution             | Future |
+| GPU Workers            | Model inference offloading       | Future |
+| Object Storage (MinIO) | Large file / result storage      | Future |
+| Kubernetes             | Container orchestration at scale | Future |
 
-*These components are **not** part of the current architecture. Docker Compose placeholders exist in `docker-compose.yml` and `.env.example`.*
+_These components are **not** part of the current architecture. Docker Compose placeholders exist in `docker-compose.yml` and `.env.example`._
 
 ---
 
@@ -923,6 +939,9 @@ docs/images/
 ```
 
 <!-- TODO: Add dashboard screenshot when UI is complete -->
+
+![Dashboard UI - Workstation](frontend/public/home-workstation.png)
+
 <!-- TODO: Add upload flow screenshot -->
 <!-- TODO: Add analysis results screenshot -->
 <!-- TODO: Add map evidence overlay screenshot -->
@@ -932,7 +951,7 @@ docs/images/
 
 ## 32. Conceptual Result Interface
 
-*(This is a conceptual design of the intended result UI — not yet fully implemented.)*
+_(This is a conceptual design of the intended result UI — not yet fully implemented.)_
 
 ```text
 ┌─────────────────────────────────────────────────┐
@@ -971,35 +990,38 @@ docs/images/
 
 ### Coding Principles
 
-*   **Modularity** — keep ML, GIS, and API layers separated
-*   **Type safety** — use Pydantic on Python, strict TypeScript on frontend
-*   **Tests** — all new features must include tests
-*   **Documentation** — update docs for architectural changes
-*   **No fake results** — never hardcode or fabricate model outputs
-*   **No secrets** — never commit credentials or API keys
-*   **Reproducibility** — deterministic pipelines, versioned dependencies
+- **Modularity** — keep ML, GIS, and API layers separated
+- **Type safety** — use Pydantic on Python, strict TypeScript on frontend
+- **Tests** — all new features must include tests
+- **Documentation** — update docs for architectural changes
+- **No fake results** — never hardcode or fabricate model outputs
+- **No secrets** — never commit credentials or API keys
+- **Reproducibility** — deterministic pipelines, versioned dependencies
 
 ---
 
 ## 34. Code Quality Standards
 
 **Python**:
-*   Type hints on all function signatures
-*   Pydantic models for all API contracts
-*   Clear module boundaries (routes → services → orchestrator)
-*   Tests via `pytest`
-*   Formatting and linting (to be configured)
+
+- Type hints on all function signatures
+- Pydantic models for all API contracts
+- Clear module boundaries (routes → services → orchestrator)
+- Tests via `pytest`
+- Formatting and linting (to be configured)
 
 **TypeScript**:
-*   Strict typing enabled
-*   Reusable, focused components
-*   Typed API client interfaces
-*   Avoid unnecessary `any`
+
+- Strict typing enabled
+- Reusable, focused components
+- Typed API client interfaces
+- Avoid unnecessary `any`
 
 **Git**:
-*   Meaningful commit messages
-*   Feature branches
-*   Reviewed Pull Requests
+
+- Meaningful commit messages
+- Feature branches
+- Reviewed Pull Requests
 
 ---
 
@@ -1023,25 +1045,25 @@ Copyright © 2026 Team LIFTOFF.
 
 **Research & Datasets**
 
-*   [GeoChat — Grounded Large Vision-Language Model for Remote Sensing](https://arxiv.org/abs/2311.15826)
-*   [VRSBench — A Benchmark for Visual Referring Segmentation in Remote Sensing](https://github.com/lx709/VRSBench)
-*   [RSVQA — Visual Question Answering for Remote Sensing](https://rsvqa.sylvainlobry.com/)
-*   [CDVQA — Change Detection Visual Question Answering](https://github.com/YZHJessica/CDVQA)
-*   [BigEarthNet — Large-Scale Sentinel-2 Benchmark](https://bigearth.net/)
-*   [SEN1-2 — Paired SAR-Optical Dataset](https://mediatum.ub.tum.de/1436631)
-*   [ISRO Bhuvan](https://bhuvan.nrsc.gov.in/)
+- [GeoChat — Grounded Large Vision-Language Model for Remote Sensing](https://arxiv.org/abs/2311.15826)
+- [VRSBench — A Benchmark for Visual Referring Segmentation in Remote Sensing](https://github.com/lx709/VRSBench)
+- [RSVQA — Visual Question Answering for Remote Sensing](https://rsvqa.sylvainlobry.com/)
+- [CDVQA — Change Detection Visual Question Answering](https://github.com/YZHJessica/CDVQA)
+- [BigEarthNet — Large-Scale Sentinel-2 Benchmark](https://bigearth.net/)
+- [SEN1-2 — Paired SAR-Optical Dataset](https://mediatum.ub.tum.de/1436631)
+- [ISRO Bhuvan](https://bhuvan.nrsc.gov.in/)
 
 **Core Technologies**
 
-*   [FastAPI](https://fastapi.tiangolo.com/)
-*   [PyTorch](https://pytorch.org/)
-*   [Hugging Face Transformers](https://huggingface.co/docs/transformers)
-*   [GDAL](https://gdal.org/)
-*   [Rasterio](https://rasterio.readthedocs.io/)
-*   [PostGIS](https://postgis.net/)
-*   [MapLibre GL JS](https://maplibre.org/)
-*   [React](https://react.dev/)
-*   [Vite](https://vitejs.dev/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [PyTorch](https://pytorch.org/)
+- [Hugging Face Transformers](https://huggingface.co/docs/transformers)
+- [GDAL](https://gdal.org/)
+- [Rasterio](https://rasterio.readthedocs.io/)
+- [PostGIS](https://postgis.net/)
+- [MapLibre GL JS](https://maplibre.org/)
+- [React](https://react.dev/)
+- [Vite](https://vitejs.dev/)
 
 ---
 
