@@ -1,114 +1,135 @@
-from __future__ import annotations
+import os
+import uuid
+import rasterio
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
+from sqlalchemy.orm import Session
+from app.api.deps import get_db, get_current_user
+from app.models.domain import User, Scene
+from app.schemas.domain import SceneResponse
+from app.services.storage import storage_backend
+from geoalchemy2.shape import from_shape
+from shapely.geometry import box
 
-from datetime import datetime
-from pathlib import Path
+from pydantic import BaseModel
+from sqlalchemy import func
 
-from fastapi import APIRouter, File, Form, Query, UploadFile
-from fastapi.responses import Response
-from pydantic import TypeAdapter
+router = APIRouter()
 
-from app.adapters.change.bi_temporal.validator import resolve_upload_path
-from app.adapters.imagery.uploaded.compatibility import validate_analysis_input
-from app.adapters.imagery.uploaded.factory import get_uploaded_imagery_provider
-from app.adapters.imagery.uploaded.validation import validate_file_size
-from app.core.errors import SatQueryError
-from app.core.responses import ApiResponse, success
-from app.services.imagery_preview import parse_bbox_wgs84, render_raster_preview_png
-from app.storage.factory import get_image_storage
-from app.schemas.domain import ImageryRequest, ImageryResult
-from app.schemas.input import (
-    AnalysisInput,
-    ImageModality,
-    InputValidationResult,
-    UploadImageResponse,
-)
-from app.storage.local import normalize_extension
-from app.tools.imagery.fetch_imagery import fetch_imagery
+class ScenePairCreate(BaseModel):
+    before_scene_id: int
+    after_scene_id: int
 
-router = APIRouter(prefix="/imagery", tags=["imagery"])
-
-_analysis_input_adapter = TypeAdapter(AnalysisInput)
-
-
-@router.post("/fetch", response_model=ApiResponse[ImageryResult])
-async def post_fetch_imagery(request: ImageryRequest) -> ApiResponse[ImageryResult]:
-    output = await fetch_imagery(request)
-    return success(output.result)
-
-
-@router.post("/upload", response_model=ApiResponse[UploadImageResponse])
-async def post_upload_imagery(
-    file: UploadFile = File(...),
-    modality: ImageModality | None = Form(default=None),
-    benchmark_dataset: bool = Form(default=False),
-    acquisition_datetime: str | None = Form(default=None),
-    co_registered_benchmark_pair: bool = Form(default=False),
-    benchmark_pair_id: str | None = Form(default=None),
-) -> ApiResponse[UploadImageResponse]:
-    if not file.filename:
-        raise SatQueryError(
-            code="missing_filename",
-            message="Upload filename is required.",
-            status_code=400,
-        )
-
-    extension = normalize_extension(Path(file.filename).suffix)
-    provider = get_uploaded_imagery_provider()
-
-    # Read into memory-bounded stream via spooled temp file behavior of UploadFile
-    contents = await file.read()
-    validate_file_size(len(contents))
-
-    from io import BytesIO
-
-    stream = BytesIO(contents)
-    parsed_acquisition: datetime | None = None
-    if acquisition_datetime:
-        try:
-            parsed_acquisition = datetime.fromisoformat(acquisition_datetime.replace("Z", "+00:00"))
-        except ValueError as exc:
-            raise SatQueryError(
-                code="invalid_acquisition_datetime",
-                message="acquisition_datetime must be ISO-8601 format.",
-                status_code=400,
-            ) from exc
-    image = provider.ingest_upload(
-        stream=stream,
-        original_filename=file.filename,
-        extension=extension,
-        modality=modality,
-        benchmark_dataset=benchmark_dataset,
-        acquisition_datetime=parsed_acquisition,
-        co_registered_benchmark=benchmark_dataset and co_registered_benchmark_pair,
-        benchmark_pair_id=benchmark_pair_id if benchmark_dataset and co_registered_benchmark_pair else None,
+@router.post("/pairs")
+def create_scene_pair(
+    pair_in: ScenePairCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from app.models.domain import ScenePair
+    
+    before_scene = db.query(Scene).filter(Scene.id == pair_in.before_scene_id, Scene.user_id == current_user.id).first()
+    after_scene = db.query(Scene).filter(Scene.id == pair_in.after_scene_id, Scene.user_id == current_user.id).first()
+    
+    if not before_scene or not after_scene:
+        raise HTTPException(status_code=404, detail="One or both scenes not found")
+        
+    # Check intersection using PostGIS ST_Intersects
+    intersects = db.query(func.ST_Intersects(before_scene.bounds, after_scene.bounds)).scalar()
+    if not intersects:
+        raise HTTPException(status_code=400, detail="Scenes do not geographically overlap. Cannot perform change analysis.")
+        
+    scene_pair = ScenePair(
+        user_id=current_user.id,
+        before_scene_id=before_scene.id,
+        after_scene_id=after_scene.id
     )
-    return success(UploadImageResponse(image=image))
+    db.add(scene_pair)
+    db.commit()
+    db.refresh(scene_pair)
+    
+    return {
+        "id": scene_pair.id,
+        "before_scene_id": scene_pair.before_scene_id,
+        "after_scene_id": scene_pair.after_scene_id,
+        "coregistration_status": scene_pair.coregistration_status
+    }
 
+@router.post("/upload", response_model=SceneResponse)
+async def upload_scene(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if not file.filename.lower().endswith(('.tif', '.tiff')):
+        raise HTTPException(status_code=400, detail="Only GeoTIFF files are allowed")
 
-@router.get("/{image_id}/preview")
-async def get_uploaded_imagery_preview(
-    image_id: str,
-    bbox: str = Query(..., description="Crop bounds as minx,miny,maxx,maxy in WGS84 degrees"),
-    max_size: int = Query(default=512, ge=64, le=2048),
-) -> Response:
-    provider = get_uploaded_imagery_provider()
-    image = provider.get(image_id)
-    bbox_wgs84 = parse_bbox_wgs84(bbox)
-    storage = get_image_storage()
-    path = resolve_upload_path(image, storage)
-    png_bytes = render_raster_preview_png(path, bbox_wgs84=bbox_wgs84, max_size=max_size)
-    return Response(content=png_bytes, media_type="image/png")
+    # Generate unique filename and save via chunked storage abstraction
+    filename = f"{uuid.uuid4()}_{file.filename}"
+    saved_path = await storage_backend.save_upload(file, filename)
 
+    try:
+        # Validate and extract metadata with rasterio
+        with rasterio.open(saved_path) as src:
+            crs_str = src.crs.to_string() if src.crs else None
+            bands = src.count
+            res_x, res_y = src.res
+            resolution = (res_x + res_y) / 2.0
+            
+            # bounds as shapely Polygon
+            bbox = box(*src.bounds)
+            # Make sure it's in 4326 for PostGIS (assuming EPSG:4326 for simplicity in Phase 0)
+            # In a real app we'd reproject bounds to 4326
+            geom = from_shape(bbox, srid=4326)
 
-@router.get("/{image_id}", response_model=ApiResponse[UploadImageResponse])
-async def get_uploaded_imagery(image_id: str) -> ApiResponse[UploadImageResponse]:
-    provider = get_uploaded_imagery_provider()
-    image = provider.get(image_id)
-    return success(UploadImageResponse(image=image))
+            # Sensor type detection heuristic
+            sensor_type = "optical"
+            sar_polarization = None
+            sar_acquisition_mode = None
+            
+            upper_filename = file.filename.upper()
+            if upper_filename.startswith("S1A") or upper_filename.startswith("S1B") or bands <= 2:
+                sensor_type = "sar"
+                # Example Sentinel-1: S1A_IW_GRDH_1SDV_...
+                parts = upper_filename.split("_")
+                if len(parts) > 3:
+                    sar_acquisition_mode = parts[1] # e.g. IW
+                    pol_str = parts[3]
+                    if len(pol_str) >= 4:
+                        if pol_str[3] == 'V':
+                            sar_polarization = 'VV/VH' if pol_str[2] == 'D' else 'VV'
+                        elif pol_str[3] == 'H':
+                            sar_polarization = 'HH/HV' if pol_str[2] == 'D' else 'HH'
 
+    except rasterio.errors.RasterioIOError:
+        os.remove(saved_path)
+        raise HTTPException(status_code=400, detail="Invalid GeoTIFF file")
 
-@router.post("/validate-input", response_model=ApiResponse[InputValidationResult])
-async def post_validate_input(payload: AnalysisInput) -> ApiResponse[InputValidationResult]:
-    parsed = _analysis_input_adapter.validate_python(payload)
-    result = validate_analysis_input(parsed)
-    return success(result)
+    # Save to DB
+    scene = Scene(
+        user_id=current_user.id,
+        filename=file.filename,
+        storage_path=saved_path,
+        crs=crs_str,
+        bounds=geom,
+        bands=bands,
+        resolution=resolution,
+        sensor_type=sensor_type,
+        sar_polarization=sar_polarization,
+        sar_acquisition_mode=sar_acquisition_mode
+    )
+    db.add(scene)
+    db.commit()
+    db.refresh(scene)
+    
+    return {
+        "id": scene.id,
+        "user_id": scene.user_id,
+        "filename": scene.filename,
+        "crs": scene.crs,
+        "bands": scene.bands,
+        "resolution": scene.resolution,
+        "sensor_type": scene.sensor_type,
+        "preprocessing_status": scene.preprocessing_status,
+        "uploaded_at": scene.uploaded_at,
+        "bbox": list(src.bounds) if 'src' in locals() else None
+    }

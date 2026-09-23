@@ -76,9 +76,11 @@ app/agent/planner.py
 app/agent/router.py
 app/agent/trace.py
 app/api/__init__.py
+app/api/deps.py
 app/api/router.py
 app/api/routes/__init__.py
 app/api/routes/analysis.py
+app/api/routes/auth.py
 app/api/routes/datasets.py
 app/api/routes/health.py
 app/api/routes/imagery.py
@@ -111,6 +113,7 @@ app/models/base.py
 app/models/captioning.py
 app/models/change_detection.py
 app/models/change_vqa.py
+app/models/domain.py
 app/models/grounding.py
 app/models/optical_sar.py
 app/models/registry.py
@@ -125,6 +128,7 @@ app/schemas/cross_modal.py
 app/schemas/dataset.py
 app/schemas/domain.py
 app/schemas/geochat_service.py
+app/schemas/geonli.py
 app/schemas/ground_context.py
 app/schemas/imagery_policy.py
 app/schemas/input.py
@@ -148,7 +152,9 @@ app/services/conversational_development.py
 app/services/cross_modal_intent.py
 app/services/cross_modal_pipeline.py
 app/services/evidence_service.py
+app/services/geonli_chat.py
 app/services/imagery_preview.py
+app/services/live_ground_context.py
 app/services/mock_ground_context.py
 app/services/query_controller.py
 app/services/query_profiles.py
@@ -161,6 +167,7 @@ app/services/report_service.py
 app/services/session_chat.py
 app/services/session_store.py
 app/services/single_image_intent.py
+app/services/storage.py
 app/services/temporal_imagery_resolver.py
 app/services/vqa_pipeline.py
 app/services/planner/__init__.py
@@ -217,6 +224,7 @@ tests/test_fusion.py
 tests/test_geochat_real_provider.py
 tests/test_imagery_preview.py
 tests/test_input_schemas.py
+tests/test_live_ground_context.py
 tests/test_mock_ground_context.py
 tests/test_multimodal_fusion.py
 tests/test_multimodal_pipeline_integration.py

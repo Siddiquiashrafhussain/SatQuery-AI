@@ -39,3 +39,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+from app.api.routes import auth, imagery
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(imagery.router, prefix="/api/v1/imagery", tags=["imagery"])

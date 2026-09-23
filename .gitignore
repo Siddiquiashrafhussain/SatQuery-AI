@@ -61,3 +61,6 @@ services/geochat/**/.pytest_cache/
 # No model weights, dataset files, or checkpoints are ever committed.
 *.ckpt
 *.safetensors
+*.tiff
+*.tif
+

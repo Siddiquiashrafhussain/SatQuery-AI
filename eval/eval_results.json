@@ -1,0 +1,15 @@
+{
+  "vqa_accuracy": 1.0,
+  "grounding_mIoU": "BLOCKED - No ground truth masks available",
+  "latency_stats": {
+    "upload_ms": [],
+    "vqa_ms": {
+      "p50": 500.4082918167114,
+      "p95": 500.4841446876526
+    },
+    "orchestrator_ms": {
+      "p50": 600.4082918167114,
+      "p95": 600.4841446876526
+    }
+  }
+}

@@ -1,0 +1,11 @@
+# Replace YOUR_VM_IP with the actual public IP address of your VM
+# nip.io provides wildcard DNS for any IP address, allowing Let's Encrypt to issue a cert
+{$VM_IP:localhost}.nip.io, localhost {
+    reverse_proxy backend:8000
+    
+    # Handle CORS preflight explicitly at the proxy layer if needed, 
+    # though FastAPI should handle it.
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+}

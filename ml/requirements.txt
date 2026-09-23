@@ -1,0 +1,12 @@
+torch==2.5.1
+transformers==4.47.1
+accelerate==1.2.1
+einops==0.8.0
+fastapi==0.115.6
+uvicorn==0.34.0
+pydantic==2.10.4
+pillow==11.0.0
+rasterio==1.4.3
+peft==0.14.0
+bitsandbytes==0.45.0
+scipy==1.14.1

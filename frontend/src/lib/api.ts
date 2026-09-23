@@ -1,185 +1,29 @@
-import type {
-  AnalysisResult,
-  ApiResponse,
-  GroundContextResult,
-  ImageryRequest,
-  ImageryResult,
-  ImageModality,
-  InterpretRegionData,
-  QueryRequest,
-  RegionChatData,
-  SubmitQueryData,
-  TraceStep,
-  UploadImageResponse,
-  GeoNLIRequest,
-  GeoNLIResult,
-} from "@/types/domain";
-import { parseHttpErrorBody, API_ERROR_MESSAGES } from "@/lib/errors";
-import { ApiError } from "@/types/domain";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
-
-async function readJsonBody(res: Response): Promise<unknown> {
-  try {
-    return await res.json();
-  } catch {
-    if (res.ok) {
-      throw new ApiError(
-        "invalid_response",
-        "Invalid JSON",
-        API_ERROR_MESSAGES.invalid_response,
-      );
-    }
-    throw parseHttpErrorBody(res.status, null);
+export async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  // get token from somewhere, assume localStorage for simplicity in this phase
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  const headers = new Headers(options.headers || {});
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
   }
+
+  const response = await fetch(`${API_BASE_URL}${url}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      if (typeof window !== 'undefined') {
+         localStorage.removeItem('access_token');
+         window.location.href = '/auth';
+      }
+    }
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(errorBody.detail || 'API Error');
+  }
+
+  return response.json();
 }
-
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_BASE}${path}`, {
-      ...init,
-      headers: {
-        "Content-Type": "application/json",
-        ...init?.headers,
-      },
-    });
-  } catch (err) {
-    throw err;
-  }
-
-  const body = await readJsonBody(res);
-  if (!res.ok) {
-    throw parseHttpErrorBody(res.status, body);
-  }
-  return (body as ApiResponse<T>).data;
-}
-
-export const api = {
-  health: () => request<{ status: string; imagery_provider: string; mode: string }>("/health"),
-
-  fetchImagery: (payload: ImageryRequest) =>
-    request<ImageryResult>("/api/v1/imagery/fetch", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }),
-
-  submitQuery: (payload: QueryRequest) =>
-    request<SubmitQueryData>("/api/v1/query/submit", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }),
-
-  uploadImagery: async (
-    file: File,
-    options?: {
-      modality?: ImageModality;
-      benchmarkDataset?: boolean;
-      acquisitionDatetime?: string;
-      coRegisteredBenchmarkPair?: boolean;
-      benchmarkPairId?: string;
-    },
-  ): Promise<UploadImageResponse> => {
-    const form = new FormData();
-    form.append("file", file);
-    if (options?.modality) form.append("modality", options.modality);
-    form.append("benchmark_dataset", String(options?.benchmarkDataset ?? false));
-    if (options?.acquisitionDatetime) {
-      form.append("acquisition_datetime", options.acquisitionDatetime);
-    }
-    if (options?.coRegisteredBenchmarkPair) {
-      form.append("co_registered_benchmark_pair", "true");
-    }
-    if (options?.benchmarkPairId) {
-      form.append("benchmark_pair_id", options.benchmarkPairId);
-    }
-
-    let res: Response;
-    try {
-      res = await fetch(`${API_BASE}/api/v1/imagery/upload`, {
-        method: "POST",
-        body: form,
-      });
-    } catch (err) {
-      throw err;
-    }
-
-    const body = await readJsonBody(res);
-    if (!res.ok) {
-      throw parseHttpErrorBody(res.status, body);
-    }
-    return (body as ApiResponse<UploadImageResponse>).data;
-  },
-
-  getTrace: (sessionId: string) =>
-    request<TraceStep[]>(`/api/v1/query/${sessionId}/trace`),
-
-  getResult: (sessionId: string) =>
-    request<AnalysisResult>(`/api/v1/query/${sessionId}/result`),
-
-  fetchGroundContext: (sessionId: string, regionId: string) =>
-    request<GroundContextResult>(
-      `/api/v1/query/${sessionId}/regions/${encodeURIComponent(regionId)}/ground-context`,
-    ),
-
-  interpretChangeRegion: (sessionId: string, regionId: string, question: string) =>
-    request<InterpretRegionData>(
-      `/api/v1/query/${sessionId}/regions/${encodeURIComponent(regionId)}/interpret`,
-      {
-        method: "POST",
-        body: JSON.stringify({ question }),
-      },
-    ),
-
-  chatChangeRegion: (sessionId: string, regionId: string, message: string) =>
-    request<RegionChatData>(
-      `/api/v1/query/${sessionId}/regions/${encodeURIComponent(regionId)}/chat`,
-      {
-        method: "POST",
-        body: JSON.stringify({ message }),
-      },
-    ),
-
-  chatSession: (sessionId: string, message: string, regionId?: string | null) =>
-    request<RegionChatData>(`/api/v1/query/${sessionId}/chat`, {
-      method: "POST",
-      body: JSON.stringify({
-        message,
-        ...(regionId ? { region_id: regionId } : {}),
-      }),
-    }),
-
-  exportRegionEvidenceUrl: (sessionId: string, regionId: string) =>
-    `${API_BASE}/api/v1/query/${sessionId}/regions/${encodeURIComponent(regionId)}/evidence`,
-
-  submitGeoNLI: (payload: GeoNLIRequest) =>
-    request<GeoNLIResult>("/api/v1/query/geonli", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }),
-
-  fetchImageryPreview: async (imageId: string, bbox: string, maxSize = 512): Promise<string> => {
-    const params = new URLSearchParams({ bbox, max_size: String(maxSize) });
-    let res: Response;
-    try {
-      res = await fetch(`${API_BASE}/api/v1/imagery/${imageId}/preview?${params.toString()}`);
-    } catch (err) {
-      throw err;
-    }
-
-    if (!res.ok) {
-      const body = await readJsonBody(res);
-      throw parseHttpErrorBody(res.status, body);
-    }
-
-    const blob = await res.blob();
-    if (!blob.type.startsWith("image/")) {
-      throw new ApiError(
-        "invalid_response",
-        "Preview response was not an image.",
-        API_ERROR_MESSAGES.invalid_response,
-      );
-    }
-    return URL.createObjectURL(blob);
-  },
-};
