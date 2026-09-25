@@ -2,6 +2,7 @@
 *.log
 .env
 .env.local
+.env.example
 
 # Local integration backups — code patches only; never env copies or .env diffs
 .integration-backups/**/.env*
